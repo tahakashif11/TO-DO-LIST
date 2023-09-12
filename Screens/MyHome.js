@@ -4,7 +4,7 @@ import {
   Text,
   View,
   TextInput,
-  FlatList,
+
   Button,
   KeyboardAvoidingView,
   ScrollView, Platform
@@ -169,12 +169,9 @@ const MyHome = () => {
 
         <Text style={styles.subtitle}>Tasks:</Text>
         <ScrollView>
-        <FlatList
-          data={filterTasks()}
-          keyExtractor={(item) => item.id.toString()}
-          keyboardShouldPersistTaps="handled"
-          renderItem={({ item }) => (
+          {filterTasks().map((item) => (
             <TaskItem
+              key={item.id.toString()}
               item={item}
               editingIndex={editingIndex}
               editedTask={editedTask}
@@ -184,8 +181,7 @@ const MyHome = () => {
               deleteTask={deleteTask}
               editTask={editTask}
             />
-          )}
-        />
+          ))}
         </ScrollView>
       </View>
     </KeyboardAvoidingView>
