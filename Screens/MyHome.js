@@ -7,7 +7,7 @@ import {
   FlatList,
   Button,
   KeyboardAvoidingView,
-  Keyboard
+  ScrollView, Platform
 } from 'react-native';
 
 
@@ -41,7 +41,6 @@ const TaskItem = memo(({ item, editingIndex, editedTask, setEditedTask, setEditi
                 onPress={() => {
                   setEditingIndex(item.id);
                   setEditedTask(item.text);
-                  
                 }}
               />
               <Button
@@ -118,7 +117,7 @@ const MyHome = () => {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 10}
     >
       <View style={styles.container}>
@@ -169,6 +168,7 @@ const MyHome = () => {
         </View>
 
         <Text style={styles.subtitle}>Tasks:</Text>
+        <ScrollView>
         <FlatList
           data={filterTasks()}
           keyExtractor={(item) => item.id.toString()}
@@ -186,6 +186,7 @@ const MyHome = () => {
             />
           )}
         />
+        </ScrollView>
       </View>
     </KeyboardAvoidingView>
   );
