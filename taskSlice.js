@@ -41,6 +41,15 @@ const taskSlice = createSlice({
     setSearchQuery: (state, action) => {
       state.searchQuery = action.payload;
     },
+    resetState: (state) => {
+      // Reset the state to its initial values here
+      state.tasks = [];
+      state.nextId = 1;
+      state.showCompleteTasks = false;
+      state.showIncompleteTasks = false;
+      state.searchQuery = '';
+    },
+    
     
       
   },
@@ -54,6 +63,7 @@ export const {
   setShowCompleteTasks,
   setShowIncompleteTasks,
   setSearchQuery,
+  resetState
 
  
 } = taskSlice.actions;
