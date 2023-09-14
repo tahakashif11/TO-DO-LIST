@@ -5,11 +5,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginPage from './Screens/LoginPage';
 import HomePage from './Screens/HomePage';
 import CustomHeader from './component/CustomHeader'; // Import your custom header component
+import { Provider } from 'react-redux';
+import store from './store'; // Import your Redux store
 
 const Stack = createNativeStackNavigator();
 
 function App() {
   return (
+    <Provider store={store}>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Boarding">
         <Stack.Screen
@@ -33,6 +36,7 @@ function App() {
         />
       </Stack.Navigator>
     </NavigationContainer>
+    </Provider>
   );
 }
 

@@ -28,7 +28,8 @@ function LoginPage({ navigation }) {
         Alert.alert('Wrong credentials. Please try again.');
       }
     } catch (error) {
-      Alert.alert('Wrong credentials. Please try again.');
+      
+      Alert.alert('An error occurred during login. Please try again.');
     }
   };
   const image = {

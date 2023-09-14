@@ -1,117 +1,63 @@
-import React, { useState, memo } from 'react'; // Import memo
+// MyHome.js
+import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-
-  Button,
-  KeyboardAvoidingView,
-  ScrollView, Platform
-} from 'react-native';
-
-
-
-// Wrap TaskItem with memo
-const TaskItem = memo(({ item, editingIndex, editedTask, setEditedTask, setEditingIndex, toggleComplete, deleteTask, editTask }) => {
-  return (
-    <View style={styles.taskItem}>
-      {editingIndex === item.id ? (
-        <View style={styles.editContainer}>
-          <TextInput
-            style={styles.editInput}
-            onChangeText={(text) => setEditedTask(text)}
-            value={editedTask}
-          />
-          <Button title="Save" onPress={editTask} />
-        </View>
-      ) : (
-        <>
-          <Text
-            style={
-              item.completed ? styles.completedTask : styles.taskText
-            }
-          >
-            {item.text}
-          </Text>
-          {!item.completed && (
-            <>
-              <Button
-                title="Edit"
-                onPress={() => {
-                  setEditingIndex(item.id);
-                  setEditedTask(item.text);
-                }}
-              />
-              <Button
-                title="Complete"
-                onPress={() => toggleComplete(item.id)}
-              />
-            </>
-          )}
-        </>
-      )}
-      <Button title="Delete" onPress={() => deleteTask(item.id)} />
-    </View>
-  );
-});
+  addTask,
+  deleteTask,
+  toggleComplete,
+  editTask,
+  setSearchQuery,
+  setShowCompleteTasks,
+  setShowIncompleteTasks,
+} from '../taskSlice';
+import { StyleSheet, Text, View, TextInput, Button,KeyboardAvoidingView,
+  ScrollView, Platform } from 'react-native';
 
 const MyHome = () => {
-  const [task, setTask] = useState('');
-  const [tasks, setTasks] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showCompleteTasks, setShowCompleteTasks] = useState(false);
-  const [showIncompleteTasks, setShowIncompleteTasks] = useState(false);
-  const [editingIndex, setEditingIndex] = useState(null);
-  const [editedTask, setEditedTask] = useState('');
-  const [nextId, setNextId] = useState(1);
+  const tasks = useSelector((state) => state.tasks.tasks);
+  const showCompleteTasks = useSelector((state) => state.tasks.showCompleteTasks);
+  const showIncompleteTasks = useSelector((state) => state.tasks.showIncompleteTasks);
+  const searchQuery = useSelector((state) => state.tasks.searchQuery);
+  const dispatch = useDispatch();
+  const [newTask, setNewTask] = useState('');
+  const [editingTask, setEditingTask] = useState(null);
+  const [editedTaskText, setEditedTaskText] = useState('');
 
-  const addTask = () => {
-    if (task.trim() !== '') {
-      const newTask = { text: task, completed: false, id: nextId };
-      setTasks([...tasks, newTask]);
-      setNextId(nextId + 1);
-      setTask('');
+
+  const filteredTasks = tasks.filter((task) => {
+    if (showCompleteTasks && showIncompleteTasks) {
+      return true;
+    } else if (showCompleteTasks) {
+      return task.completed;
+    } else if (showIncompleteTasks) {
+      return !task.completed;
+    } else {
+      return true;
+    }
+  });
+
+  const searchedTasks = filteredTasks.filter((task) =>
+    task.text.toString().toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const addTaskHandler = () => {
+    if (newTask.trim() !== '') {
+      dispatch(addTask(newTask));
+      setNewTask('');
     }
   };
 
-  const deleteTask = (taskId) => {
-    const updatedTasks = tasks.filter((item) => item.id !== taskId);
-    setTasks(updatedTasks);
+  const deleteTaskHandler = (taskId) => {
+    dispatch(deleteTask(taskId));
   };
 
-  const toggleComplete = (taskId) => {
-    const updatedTasks = tasks.map((item) =>
-      item.id === taskId ? { ...item, completed: !item.completed } : item
-    );
-    setTasks(updatedTasks);
+  const toggleCompleteHandler = (taskId) => {
+    dispatch(toggleComplete(taskId));
   };
 
-  const editTask = () => {
-    if (editedTask.trim() !== '') {
-      const updatedTasks = tasks.map((item) =>
-        item.id === editingIndex ? { ...item, text: editedTask } : item
-      );
-      setTasks(updatedTasks);
-      setEditingIndex(null);
-      setEditedTask('');
-    }
-  };
-
-  const filterTasks = () => {
-    let tasksToDisplay = tasks;
-
-    if (showCompleteTasks) {
-      tasksToDisplay = tasksToDisplay.filter((item) => item.completed);
-    }
-
-    if (showIncompleteTasks) {
-      tasksToDisplay = tasksToDisplay.filter((item) => !item.completed);
-    }
-
-    return tasksToDisplay.filter((item) =>
-      item.text.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+  const editTaskHandler = (taskToEdit, editedText) => {
+    dispatch(editTask({ id: taskToEdit.id, text: editedText }));
+    setEditingTask(null);
   };
 
   return (
@@ -120,70 +66,89 @@ const MyHome = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : null}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 10}
     >
-      <View style={styles.container}>
-        <Text style={styles.title}>Todo-App</Text>
+   
+    <View style={styles.container}>
+      <Text style={styles.title}>Todo-App</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Search"
-          onChangeText={(text) => setSearchQuery(text)}
-          value={searchQuery}
-        />
+      <TextInput
+        style={styles.input}
+        placeholder="Search"
+        onChangeText={(text) => dispatch(setSearchQuery(text))}
+        value={searchQuery}
+      />
 
-        <TextInput
-          style={styles.input}
-          placeholder="ADD"
-          onChangeText={(text) => {
-            setTask(text);
+      <TextInput
+        style={styles.input}
+        placeholder="Add Task"
+        onChangeText={(text) => setNewTask(text)}
+        value={newTask}
+      />
+      <Button title="Add Task" onPress={addTaskHandler} />
+      <View style={styles.filterContainer}>
+        <Button
+          title="All"
+          onPress={() => {
+            dispatch(setShowCompleteTasks(false));
+            dispatch(setShowIncompleteTasks(false));
           }}
-          value={task}
         />
-
-        <Button title="Add Task" onPress={addTask} />
-
-        <View style={styles.buttonContainer}>
-          <Button
-            title="All"
-            onPress={() => {
-              setShowCompleteTasks(false);
-              setShowIncompleteTasks(false);
-            }}
-          />
-
-          <Button
-            title="Complete"
-            onPress={() => {
-              setShowCompleteTasks(true);
-              setShowIncompleteTasks(false);
-            }}
-          />
-
-          <Button
-            title="Incomplete"
-            onPress={() => {
-              setShowCompleteTasks(false);
-              setShowIncompleteTasks(true);
-            }}
-          />
-        </View>
-
-        <Text style={styles.subtitle}>Tasks:</Text>
-        <ScrollView>
-          {filterTasks().map((item) => (
-            <TaskItem
-              key={item.id.toString()}
-              item={item}
-              editingIndex={editingIndex}
-              editedTask={editedTask}
-              setEditedTask={setEditedTask}
-              setEditingIndex={setEditingIndex}
-              toggleComplete={toggleComplete}
-              deleteTask={deleteTask}
-              editTask={editTask}
-            />
-          ))}
-        </ScrollView>
+        <Button
+          title="Complete"
+          onPress={() => {
+            dispatch(setShowCompleteTasks(true));
+            dispatch(setShowIncompleteTasks(false));
+          }}
+        />
+        <Button
+          title="Incomplete"
+          onPress={() => {
+            dispatch(setShowCompleteTasks(false));
+            dispatch(setShowIncompleteTasks(true));
+          }}
+        />
       </View>
+
+      <Text style={styles.subtitle}>Tasks:</Text>
+
+      
+      <ScrollView>
+        {searchedTasks.map((task) => (
+  <View key={task.id} style={styles.taskItem}>
+    {editingTask === task.id ? (
+      <View style={styles.editContainer}>
+      <TextInput
+      style={styles.editInput}
+      onChangeText={(text) => setEditedTaskText(text)} // Update edited text
+      value={editedTaskText} // Use editedTaskText for input value
+    />
+    <Button title="Save" onPress={() => editTaskHandler(task, editedTaskText)} />
+
+      </View>
+    ) : (
+      <>
+        <Text style={task.completed ? styles.completedTask : styles.taskText}>
+          {task.text ? task.text : ''} {/* Add a check for task.text */}
+        </Text>
+        {!task.completed && (
+          <>
+          <Button
+          title="Edit"
+          onPress={() => {
+            setEditedTaskText(task.text); // Set the edited text
+            setEditingTask(task.id); // Open edit mode
+          }}
+        />
+            <Button title="Complete" onPress={() => toggleCompleteHandler(task.id)} />
+          </>
+        )}
+      </>
+    )}
+    <Button title="Delete" onPress={() => deleteTaskHandler(task.id)} />
+  </View>
+))}
+
+      </ScrollView>
+    </View>
     </KeyboardAvoidingView>
   );
 };
@@ -211,7 +176,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     flex: 1,
   },
-  buttonContainer: {
+  filterContainer: {
     paddingTop: 8,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -240,7 +205,7 @@ const styles = StyleSheet.create({
   editContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-  }
+  },
 });
 
 export default MyHome;
