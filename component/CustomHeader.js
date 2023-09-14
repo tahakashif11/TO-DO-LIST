@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
+import { resetState } from '../taskSlice';
+import {  useDispatch } from 'react-redux';
 
 const CustomHeader = ({ title, navigation }) => {
-  
+  const dispatch = useDispatch();
 
   const handleLogout = () => {
     dispatch(resetState());
