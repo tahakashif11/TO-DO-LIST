@@ -1,26 +1,44 @@
-
 import 'react-native-gesture-handler';
-
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ImageBackground,TouchableOpacity} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  Alert,
+  ImageBackground,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
+  ActivityIndicator, // Import ActivityIndicator
+} from 'react-native';
 import axios from 'axios';
-
 
 function LoginPage({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+   // Add loading state
 
   const handleLogin = async () => {
+    
+  
     try {
       let response = await axios.post('https://dummyjson.com/auth/login', {
         username,
         password,
       });
-      
+  
       let authToken = response.data.token;
       let userid = response.data.id;
   
       if (authToken) {
+        // Store user authentication data
+        await AsyncStorage.setItem('authToken', authToken);
+        await AsyncStorage.setItem('userid', userid.toString());
+        console.log('Navigating to Home');
+  
         navigation.navigate('Home', {
           userid,
         });
@@ -28,38 +46,41 @@ function LoginPage({ navigation }) {
         Alert.alert('Wrong credentials. Please try again.');
       }
     } catch (error) {
-      
       Alert.alert('An error occurred during login. Please try again.');
-    }
+    } 
   };
+
   const image = {
     uri:
       'https://img.freepik.com/free-vector/list-concept-illustration_114360-2498.jpg?w=2000',
   };
-  return (
-    <View style={styles.container}>
-      <ImageBackground source={image} style={styles.backgroundImage}>
-        <View style={styles.formContainer}>
-          <Text style={styles.heading}>Welcome!</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Username"
-            onChangeText={(text) => setUsername(text)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry
-            onChangeText={(text) => setPassword(text)}
-          />
-          <TouchableOpacity style={styles.button}onPress={handleLogin}  >
-        <Text style={styles.buttonText}>Click Me</Text>
-      </TouchableOpacity>
 
-          
-        </View>
-      </ImageBackground>
-    </View>
+  return (
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <View style={styles.container}>
+        <ImageBackground source={image} style={styles.backgroundImage}>
+          <View style={styles.formContainer}>
+            <Text style={styles.heading}>Welcome!</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Username"
+              onChangeText={(text) => setUsername(text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              secureTextEntry
+              onChangeText={(text) => setPassword(text)}
+            />
+            <TouchableOpacity style={styles.button} onPress={handleLogin}>
+             
+                <Text style={styles.buttonText}>Click Me</Text>
+              
+            </TouchableOpacity>
+          </View>
+        </ImageBackground>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -91,7 +112,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: '#ffffff',
     borderWidth: 1,
-    textShadowColor:'#ffffff',
+    textShadowColor: '#ffffff',
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
@@ -103,15 +124,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     borderRadius: 5,
     elevation: 3,
-   
   },
   buttonText: {
     color: '#ffffff', // Text color
     fontSize: 16,
     fontWeight: 'bold',
-    
-    textAlign: 'center'
-     // You can adjust the font weight as needed
+    textAlign: 'center', // You can adjust the font weight as needed
   },
 });
 

@@ -13,9 +13,7 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 
 const Tab = createMaterialBottomTabNavigator();
 const HomePage = ({ route, navigation }) => {
-  function logout() {
-    navigation.navigate('Login')
-  }
+  
   console.log(route.params)
   return (
     <View style={styles.container}>
