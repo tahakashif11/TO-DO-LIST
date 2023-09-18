@@ -17,6 +17,7 @@ import {
   Button,
   ScrollView,
   Keyboard,
+  TouchableOpacity, // Import TouchableOpacity for button styling
 } from 'react-native';
 
 const MyHome = () => {
@@ -28,6 +29,7 @@ const MyHome = () => {
   const [newTask, setNewTask] = useState('');
   const [editingTask, setEditingTask] = useState(null);
   const [editedTaskText, setEditedTaskText] = useState('');
+  const [activeFilter, setActiveFilter] = useState('All'); // Track the active filter
 
   const filteredTasks = tasks.filter((task) => {
     if (showCompleteTasks && showIncompleteTasks) {
@@ -67,6 +69,26 @@ const MyHome = () => {
     setEditingTask(null);
   };
 
+  const applyFilter = (filter) => {
+    setActiveFilter(filter);
+    switch (filter) {
+      case 'All':
+        dispatch(setShowCompleteTasks(false));
+        dispatch(setShowIncompleteTasks(false));
+        break;
+      case 'Complete':
+        dispatch(setShowCompleteTasks(true));
+        dispatch(setShowIncompleteTasks(false));
+        break;
+      case 'Incomplete':
+        dispatch(setShowCompleteTasks(false));
+        dispatch(setShowIncompleteTasks(true));
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Todo-App</Text>
@@ -87,27 +109,24 @@ const MyHome = () => {
       <Button title="Add Task" onPress={addTaskHandler} />
 
       <View style={styles.filterContainer}>
-        <Button
-          title="All"
-          onPress={() => {
-            dispatch(setShowCompleteTasks(false));
-            dispatch(setShowIncompleteTasks(false));
-          }}
-        />
-        <Button
-          title="Complete"
-          onPress={() => {
-            dispatch(setShowCompleteTasks(true));
-            dispatch(setShowIncompleteTasks(false));
-          }}
-        />
-        <Button
-          title="Incomplete"
-          onPress={() => {
-            dispatch(setShowCompleteTasks(false));
-            dispatch(setShowIncompleteTasks(true));
-          }}
-        />
+        <TouchableOpacity
+          style={[styles.filterButton, activeFilter === 'All' && styles.activeFilter]} // Apply active style
+          onPress={() => applyFilter('All')}
+        >
+          <Text style={styles.filterButtonText}>All</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterButton, activeFilter === 'Complete' && styles.activeFilter]} // Apply active style
+          onPress={() => applyFilter('Complete')}
+        >
+          <Text style={styles.filterButtonText}>Complete</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterButton, activeFilter === 'Incomplete' && styles.activeFilter]} // Apply active style
+          onPress={() => applyFilter('Incomplete')}
+        >
+          <Text style={styles.filterButtonText}>Incomplete</Text>
+        </TouchableOpacity>
       </View>
 
       <Text style={styles.subtitle}>Tasks:</Text>
@@ -192,6 +211,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 16,
+  },
+  filterButton: {
+    flex: 1,
+    backgroundColor: '#f0f0f0', // Background color for filter buttons
+    padding: 8,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  filterButtonText: {
+    fontSize: 16,
+  },
+  activeFilter: {
+    backgroundColor: '#3498db', // Background color for active filter button
   },
   subtitle: {
     fontSize: 20,
