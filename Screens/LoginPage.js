@@ -12,33 +12,32 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
-  ActivityIndicator, // Import ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 import axios from 'axios';
 
 function LoginPage({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-   // Add loading state
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    
-  
+    setLoading(true);
+
     try {
       let response = await axios.post('https://dummyjson.com/auth/login', {
         username,
         password,
       });
-  
+
       let authToken = response.data.token;
       let userid = response.data.id;
-  
+
       if (authToken) {
-        // Store user authentication data
         await AsyncStorage.setItem('authToken', authToken);
         await AsyncStorage.setItem('userid', userid.toString());
         console.log('Navigating to Home');
-  
+
         navigation.navigate('Home', {
           userid,
         });
@@ -47,7 +46,9 @@ function LoginPage({ navigation }) {
       }
     } catch (error) {
       Alert.alert('An error occurred during login. Please try again.');
-    } 
+    } finally {
+      setLoading(false);
+    }
   };
 
   const image = {
@@ -64,18 +65,26 @@ function LoginPage({ navigation }) {
             <TextInput
               style={styles.input}
               placeholder="Username"
+              placeholderTextColor="#ccc" // Customize placeholder color
               onChangeText={(text) => setUsername(text)}
             />
             <TextInput
               style={styles.input}
               placeholder="Password"
+              placeholderTextColor="#ccc" // Customize placeholder color
               secureTextEntry
               onChangeText={(text) => setPassword(text)}
             />
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-             
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleLogin}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color="#ffffff" />
+              ) : (
                 <Text style={styles.buttonText}>Click Me</Text>
-              
+              )}
             </TouchableOpacity>
           </View>
         </ImageBackground>
@@ -94,13 +103,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   formContainer: {
-    backgroundColor: 'black',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Transparent black background
     padding: 20,
-    borderRadius: 50,
-    paddingLeft: 30,
-    paddingRight: 30,
-    justifyContent: 'flex-start',
-    marginTop: 30, // Adjust this value to move the form down
+    borderRadius: 20, // Adjust border radius
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: 30,
   },
   heading: {
     fontSize: 24,
@@ -119,17 +127,17 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   button: {
-    backgroundColor: '#3498db', // Change to your desired button color
+    backgroundColor: '#3498db',
     paddingVertical: 10,
-    paddingHorizontal: 5,
     borderRadius: 5,
     elevation: 3,
+    alignItems: 'center',
   },
   buttonText: {
-    color: '#ffffff', // Text color
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center', // You can adjust the font weight as needed
+    textAlign: 'center',
   },
 });
 

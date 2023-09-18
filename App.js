@@ -4,9 +4,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomePage from './Screens/HomePage';
 import LoginPage from './Screens/LoginPage';
 import CustomHeader from './component/CustomHeader';
-import { Provider } from 'react-redux';
-import store from './store';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react'; // Import PersistGate
+import { store, persistor } from './redux/store';
 
 const Stack = createNativeStackNavigator();
 
@@ -39,6 +41,7 @@ const App = () => {
     // Render the Login screen
     return (
       <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Login">
             <Stack.Screen
@@ -59,12 +62,14 @@ const App = () => {
             />
           </Stack.Navigator>
         </NavigationContainer>
+        </PersistGate>
       </Provider>
     );
   } else if (initialRoute === 'Home') {
     // Render the Home screen
     return (
       <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Home">
             <Stack.Screen
@@ -85,6 +90,7 @@ const App = () => {
           />
           </Stack.Navigator>
         </NavigationContainer>
+        </PersistGate>
       </Provider>
     );
   }

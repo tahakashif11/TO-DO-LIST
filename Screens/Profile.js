@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Image, ImageBackground, ActivityIndicator } from 'react-native';
 import React, { useEffect, useState } from 'react'; // Import useState
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUserProfile } from '../profileSlice';
+import { fetchUserProfile } from '../redux/profileSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Profile = () => {
@@ -26,7 +26,7 @@ const Profile = () => {
   }, [dispatch]); // Dependencies array for useEffect
 
   const userData = useSelector((state) => state.profile.userData);
-  console.log(state)
+  console.log(userData)
   const loading = useSelector((state) => state.profile.loading);
 
   return (

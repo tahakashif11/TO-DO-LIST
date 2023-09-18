@@ -1,5 +1,4 @@
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import EvilIcons from 'react-native-vector-icons/EvilIcons';
 
 
 import { StyleSheet, Button, View } from 'react-native'
@@ -12,7 +11,7 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 
 
 const Tab = createMaterialBottomTabNavigator();
-const HomePage = ({ route, navigation }) => {
+const HomePage = ({ route }) => {
   
   console.log(route.params)
   return (

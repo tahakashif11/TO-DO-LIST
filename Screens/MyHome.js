@@ -1,4 +1,3 @@
-// MyHome.js
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -9,9 +8,16 @@ import {
   setSearchQuery,
   setShowCompleteTasks,
   setShowIncompleteTasks,
-} from '../taskSlice';
-import { StyleSheet, Text, View, TextInput, Button,KeyboardAvoidingView,
-  ScrollView, Platform } from 'react-native';
+} from '../redux/taskSlice';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Button,
+  ScrollView,
+  Keyboard,
+} from 'react-native';
 
 const MyHome = () => {
   const tasks = useSelector((state) => state.tasks.tasks);
@@ -22,7 +28,6 @@ const MyHome = () => {
   const [newTask, setNewTask] = useState('');
   const [editingTask, setEditingTask] = useState(null);
   const [editedTaskText, setEditedTaskText] = useState('');
-
 
   const filteredTasks = tasks.filter((task) => {
     if (showCompleteTasks && showIncompleteTasks) {
@@ -44,6 +49,8 @@ const MyHome = () => {
     if (newTask.trim() !== '') {
       dispatch(addTask(newTask));
       setNewTask('');
+      // Dismiss the keyboard after adding a task
+      Keyboard.dismiss();
     }
   };
 
@@ -61,12 +68,6 @@ const MyHome = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : null}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 10}
-    >
-   
     <View style={styles.container}>
       <Text style={styles.title}>Todo-App</Text>
 
@@ -84,6 +85,7 @@ const MyHome = () => {
         value={newTask}
       />
       <Button title="Add Task" onPress={addTaskHandler} />
+
       <View style={styles.filterContainer}>
         <Button
           title="All"
@@ -110,46 +112,55 @@ const MyHome = () => {
 
       <Text style={styles.subtitle}>Tasks:</Text>
 
-      
       <ScrollView>
         {searchedTasks.map((task) => (
-  <View key={task.id} style={styles.taskItem}>
-    {editingTask === task.id ? (
-      <View style={styles.editContainer}>
-      <TextInput
-      style={styles.editInput}
-      onChangeText={(text) => setEditedTaskText(text)} // Update edited text
-      value={editedTaskText} // Use editedTaskText for input value
-    />
-    <Button title="Save" onPress={() => editTaskHandler(task, editedTaskText)} />
-
-      </View>
-    ) : (
-      <>
-        <Text style={task.completed ? styles.completedTask : styles.taskText}>
-          {task.text ? task.text : ''} {/* Add a check for task.text */}
-        </Text>
-        {!task.completed && (
-          <>
-          <Button
-          title="Edit"
-          onPress={() => {
-            setEditedTaskText(task.text); // Set the edited text
-            setEditingTask(task.id); // Open edit mode
-          }}
-        />
-            <Button title="Complete" onPress={() => toggleCompleteHandler(task.id)} />
-          </>
-        )}
-      </>
-    )}
-    <Button title="Delete" onPress={() => deleteTaskHandler(task.id)} />
-  </View>
-))}
-
+          <View key={task.id} style={styles.taskItem}>
+            {editingTask === task.id ? (
+              <View style={styles.editContainer}>
+                <TextInput
+                  style={styles.editInput}
+                  onChangeText={(text) => setEditedTaskText(text)} // Update edited text
+                  value={editedTaskText} // Use editedTaskText for input value
+                />
+                <Button
+                  title="Save"
+                  onPress={() => editTaskHandler(task, editedTaskText)}
+                />
+              </View>
+            ) : (
+              <>
+                <Text
+                  style={
+                    task.completed ? styles.completedTask : styles.taskText
+                  }
+                >
+                  {task.text ? task.text : ''}
+                </Text>
+                {!task.completed && (
+                  <>
+                    <Button
+                      title="Edit"
+                      onPress={() => {
+                        setEditedTaskText(task.text);
+                        setEditingTask(task.id);
+                      }}
+                    />
+                    <Button
+                      title="Complete"
+                      onPress={() => toggleCompleteHandler(task.id)}
+                    />
+                  </>
+                )}
+              </>
+            )}
+            <Button
+              title="Delete"
+              onPress={() => deleteTaskHandler(task.id)}
+            />
+          </View>
+        ))}
       </ScrollView>
     </View>
-    </KeyboardAvoidingView>
   );
 };
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
-import { resetState } from '../taskSlice';
+import { resetState } from '../redux/taskSlice';
 import { useDispatch } from 'react-redux';
 
 const CustomHeader = ({ title, navigation }) => {
