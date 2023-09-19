@@ -1,11 +1,9 @@
 import 'react-native-gesture-handler';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TextInput,
-  Button,
   StyleSheet,
   Alert,
   ImageBackground,
@@ -14,40 +12,31 @@ import {
   Keyboard,
   ActivityIndicator,
 } from 'react-native';
-import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux'; 
+import { loginUser } from '../redux/authslice';
 
 function LoginPage({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+
+  const loading = useSelector((state) => state.auth.loading);
 
   const handleLogin = async () => {
-    setLoading(true);
-
     try {
-      let response = await axios.post('https://dummyjson.com/auth/login', {
-        username,
-        password,
-      });
+      const response = await dispatch(loginUser({ username, password }));
 
-      let authToken = response.data.token;
-      let userid = response.data.id;
-
-      if (authToken) {
-        await AsyncStorage.setItem('authToken', authToken);
-        await AsyncStorage.setItem('userid', userid.toString());
+      if (response) {
         console.log('Navigating to Home');
 
         navigation.navigate('Home', {
-          userid,
+          userid: response.id,
         });
       } else {
         Alert.alert('Wrong credentials. Please try again.');
       }
     } catch (error) {
-      Alert.alert('An error occurred during login. Please try again.');
-    } finally {
-      setLoading(false);
+      Alert.alert(error.message || 'An error occurred during login. Please try again.');
     }
   };
 

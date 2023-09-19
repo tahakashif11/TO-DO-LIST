@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   addTask,
@@ -30,6 +30,9 @@ const MyHome = () => {
   const [editingTask, setEditingTask] = useState(null);
   const [editedTaskText, setEditedTaskText] = useState('');
   const [activeFilter, setActiveFilter] = useState('All'); // Track the active filter
+  
+
+    
 
   const filteredTasks = tasks.filter((task) => {
     if (showCompleteTasks && showIncompleteTasks) {
@@ -91,7 +94,7 @@ const MyHome = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Todo-App</Text>
+      <Text style={styles.title}>Hello</Text>
 
       <TextInput
         style={styles.input}

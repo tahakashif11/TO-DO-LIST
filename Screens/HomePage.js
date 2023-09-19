@@ -25,6 +25,7 @@ const HomePage = ({ route }) => {
       <Tab.Screen
         name="Homies"
         component={MyHome}
+        initialParams={route.params}
         options={{
           tabBarLabel: 'Home',
           tabBarIcon: ({ color }) => (
