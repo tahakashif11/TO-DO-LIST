@@ -1,19 +1,17 @@
 import { StyleSheet, Text, View, Image, ImageBackground, ActivityIndicator } from 'react-native';
-import React, { useEffect, useState } from 'react'; // Import useState
+import React, { useEffect, useState } from 'react'; 
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserProfile } from '../redux/profileSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Profile = () => {
   const dispatch = useDispatch();
-  const userId = useSelector((state) => state.auth.userId); // Access userId from Redux state
+  const userId = useSelector((state) => state.auth.userId); 
   console.log('yes'+userId)
   
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Remove AsyncStorage code for userId, as you are using Redux state now
-        // Dispatch the fetchUserProfile action
         dispatch(fetchUserProfile(userId));
       } catch (error) {
         console.error('Error fetching user data:', error);
