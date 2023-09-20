@@ -4,6 +4,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 import { resetState } from '../redux/taskSlice';
 import { useDispatch } from 'react-redux';
+import { resetAuthState } from '../redux/authslice';
 
 const CustomHeader = ({ title, navigation }) => {
   const dispatch = useDispatch();
@@ -17,7 +18,9 @@ const CustomHeader = ({ title, navigation }) => {
     }
 
     // Dispatch the resetState action
+   
     dispatch(resetState());
+    dispatch(resetAuthState())
 
     // Navigate to the Login screen
     navigation.navigate('Login');

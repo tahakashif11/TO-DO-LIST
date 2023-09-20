@@ -6,15 +6,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Profile = () => {
   const dispatch = useDispatch();
-  const [userId, setUserId] = useState(null); // Initialize userId as null
-
+  const userId = useSelector((state) => state.auth.userId); // Access userId from Redux state
+  console.log('yes'+userId)
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userIdString = await AsyncStorage.getItem('userid');
-        const userId = parseInt(userIdString, 10); // Convert the string to a number
-        setUserId(userId); // Set the userId in state
-
+        // Remove AsyncStorage code for userId, as you are using Redux state now
         // Dispatch the fetchUserProfile action
         dispatch(fetchUserProfile(userId));
       } catch (error) {
@@ -23,7 +21,7 @@ const Profile = () => {
     };
 
     fetchData(); // Call the async function inside useEffect
-  }, [dispatch]); // Dependencies array for useEffect
+  }, [dispatch, userId]); // Dependencies array for useEffect
 
   const userData = useSelector((state) => state.profile.userData);
   console.log(userData)

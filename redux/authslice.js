@@ -1,61 +1,65 @@
 // authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Define an initial state for the authentication slice
 const initialState = {
   user: null,
   authToken: null,
-  loading: false, // Add the loading state
+  userId: null, // Add userId to the initial state
   error: null,
 };
 
-// Define an async thunk for user login
-export const loginUser = createAsyncThunk('auth/loginUser', async (credentials) => {
+export const login = createAsyncThunk('auth/login', async ({ username, password }) => {
   try {
-    const response = await axios.post('https://dummyjson.com/auth/login', credentials);
+    const response = await axios.post('https://dummyjson.com/auth/login', {
+      username,
+      password,
+    });
 
-    if (response.data.token) {
-      // Save the user token and data to AsyncStorage
-      await AsyncStorage.setItem('authToken', response.data.token);
-      await AsyncStorage.setItem('userid', response.data.id.toString());
+    const authToken = response.data.token;
+    const userId = response.data.id;
+    console.log(authToken);
+    console.log('atstart' + userId);
 
-      // Return the user data
-      return response.data;
+    if (authToken) {
+      return { authToken, userId };
     } else {
       throw new Error('Wrong credentials. Please try again.');
     }
   } catch (error) {
-    throw error;
+    throw new Error('An error occurred during login. Please try again.');
   }
 });
 
-// Create the authentication slice
+// Updated resetAuthState action
+export const resetAuthState = () => ({
+  type: 'auth/resetState',
+});
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    // Define any additional reducers here if needed
+    // Define a reducer for resetting auth state
+    resetState: (state) => {
+      state.userId = null;
+      state.authToken = null;
+    },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(loginUser.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.loading = false;
+      .addCase(login.pending, (state) => {})
+      .addCase(login.fulfilled, (state, action) => {
         state.user = action.payload;
-        state.authToken = action.payload.token;
+        state.authToken = action.payload.authToken;
+        state.userId = action.payload.userId; // Set userId when login is successful
         state.error = null;
       })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.loading = false;
+      .addCase(login.rejected, (state, action) => {
         state.error = action.error.message;
       });
   },
 });
 
-// Export the action creators and reducer
-export const { logoutUser } = authSlice.actions;
+export const { resetState } = authSlice.actions; // Export the resetState action
 export default authSlice.reducer;

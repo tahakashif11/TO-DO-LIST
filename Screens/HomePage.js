@@ -11,9 +11,9 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 
 
 const Tab = createMaterialBottomTabNavigator();
-const HomePage = ({ route }) => {
+const HomePage = () => {
   
-  console.log(route.params)
+  
   return (
     <View style={styles.container}>
 
@@ -25,7 +25,6 @@ const HomePage = ({ route }) => {
       <Tab.Screen
         name="Homies"
         component={MyHome}
-        initialParams={route.params}
         options={{
           tabBarLabel: 'Home',
           tabBarIcon: ({ color }) => (
@@ -38,7 +37,6 @@ const HomePage = ({ route }) => {
       <Tab.Screen
         name="Profile"
         component={Profile}
-        initialParams={route.params}
         options={{
           tabBarLabel: 'Profile',
           tabBarIcon: ({ color }) => (

@@ -1,9 +1,11 @@
 import 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TextInput,
+  
   StyleSheet,
   Alert,
   ImageBackground,
@@ -12,34 +14,28 @@ import {
   Keyboard,
   ActivityIndicator,
 } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux'; 
-import { loginUser } from '../redux/authslice';
-
+import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../redux/authslice';
 function LoginPage({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const dispatch = useDispatch();
+  const dispatch=useDispatch()
 
-  const loading = useSelector((state) => state.auth.loading);
-
-  const handleLogin = async () => {
-    try {
-      const response = await dispatch(loginUser({ username, password }));
-
-      if (response) {
-        console.log('Navigating to Home');
-
-        navigation.navigate('Home', {
-          userid: response.id,
-        });
-      } else {
-        Alert.alert('Wrong credentials. Please try again.');
-      }
-    } catch (error) {
-      Alert.alert(error.message || 'An error occurred during login. Please try again.');
-    }
-  };
-
+  const handleLogin = () => {
+    // Dispatch the login action here
+    dispatch(login({ username, password }))
+      .then((result) => {
+        if (result.payload.authToken) {
+          navigation.navigate('Home', { userId: result.payload.userId });
+        } else {
+          Alert.alert('Wrong credentials. Please try again.');
+        }
+      })
+      .catch((error) => {
+        Alert.alert('An error occurred during login. Please try again.');
+      });
+  }
   const image = {
     uri:
       'https://img.freepik.com/free-vector/list-concept-illustration_114360-2498.jpg?w=2000',
@@ -67,13 +63,10 @@ function LoginPage({ navigation }) {
             <TouchableOpacity
               style={styles.button}
               onPress={handleLogin}
-              disabled={loading}
             >
-              {loading ? (
-                <ActivityIndicator size="small" color="#ffffff" />
-              ) : (
+              
                 <Text style={styles.buttonText}>Click Me</Text>
-              )}
+              
             </TouchableOpacity>
           </View>
         </ImageBackground>

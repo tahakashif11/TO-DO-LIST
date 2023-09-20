@@ -9,15 +9,13 @@ import authReducer from './authslice'
 const rootReducer = combineReducers({
   tasks: taskReducer,
   profile: profileReducer,
-  auth: authReducer, // Include the auth reducer
-
+  auth: authReducer, 
 });
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  // Optionally, you can whitelist specific reducers if needed:
-  // whitelist: ['tasks', 'profile'],
+  
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
