@@ -1,13 +1,22 @@
 // In your profileSlice.js
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
-
+import  firestore  from '@react-native-firebase/firestore';
 export const fetchUserProfile = createAsyncThunk(
   'profile/fetchUserProfile',
   async (userId) => {
     try {
-      const response = await axios.get(`https://dummyjson.com/users/${userId}`);
-      return response.data;
+      // Assuming you have a Firestore collection named 'users'
+      const userDoc = await firestore().collection('users').doc(userId).get();
+      console.log('ok'+userDoc)
+
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        console.log('yes'+userData)
+        return userData;
+      } else {
+        throw new Error('User not found');
+      }
     } catch (error) {
       throw error;
     }

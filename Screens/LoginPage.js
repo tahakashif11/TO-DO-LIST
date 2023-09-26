@@ -1,6 +1,5 @@
 import 'react-native-gesture-handler';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -12,19 +11,21 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
-  ActivityIndicator,
 } from 'react-native';
-import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { login } from '../redux/authslice';
 function LoginPage({ navigation }) {
-  const [username, setUsername] = useState('');
+  const [email, setemail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch=useDispatch()
 
+  function handlesignup(){
+    navigation.navigate('Signup')
+  }
+
   const handleLogin = () => {
     // Dispatch the login action here
-    dispatch(login({ username, password }))
+    dispatch(login({ email, password }))
       .then((result) => {
         if (result.payload.authToken) {
           navigation.navigate('Home', { userId: result.payload.userId });
@@ -33,7 +34,7 @@ function LoginPage({ navigation }) {
         }
       })
       .catch((error) => {
-        Alert.alert('An error occurred during login. Please try again.');
+        Alert.alert('Wrong credentials. Please try again.');
       });
   }
   const image = {
@@ -49,9 +50,9 @@ function LoginPage({ navigation }) {
             <Text style={styles.heading}>Welcome!</Text>
             <TextInput
               style={styles.input}
-              placeholder="Username"
+              placeholder="email"
               placeholderTextColor="#ccc" // Customize placeholder color
-              onChangeText={(text) => setUsername(text)}
+              onChangeText={(text) => setemail(text)}
             />
             <TextInput
               style={styles.input}
@@ -66,6 +67,14 @@ function LoginPage({ navigation }) {
             >
               
                 <Text style={styles.buttonText}>Click Me</Text>
+              
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handlesignup}
+            >
+              
+                <Text style={styles.buttonText}>Sign-up</Text>
               
             </TouchableOpacity>
           </View>
@@ -85,9 +94,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   formContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Transparent black background
+    backgroundColor: 'rgba(0, 0, 0, 0.7)', 
     padding: 20,
-    borderRadius: 20, // Adjust border radius
+    borderRadius: 20, 
     marginLeft: 20,
     marginRight: 20,
     marginTop: 30,
@@ -114,6 +123,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     elevation: 3,
     alignItems: 'center',
+    marginBottom: 10,
+  
   },
   buttonText: {
     color: '#ffffff',

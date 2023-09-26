@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomePage from './Screens/HomePage';
 import LoginPage from './Screens/LoginPage';
 import CustomHeader from './component/CustomHeader';
+import Signup from './Screens/Signup';
 import { useSelector } from 'react-redux';
 
 const Stack = createNativeStackNavigator();
@@ -15,7 +16,9 @@ const App = () => {
 
   useEffect(() => {
     const authenticateUser = () => {
+      console.log(authToken)
       const route = authToken ? 'Home' : 'Login';
+
       setInitialRoute(route);
     };
 
@@ -44,6 +47,11 @@ const App = () => {
               headerBackVisible: false,
             }}
           />
+          <Stack.Screen
+          name="Signup"
+          component={Signup}
+          options={{ headerShown: false }}
+        />
         </Stack.Navigator>
       </NavigationContainer>
     );
@@ -67,6 +75,11 @@ const App = () => {
               headerBackVisible: false,
             }}
           />
+          <Stack.Screen
+          name="Signup"
+          component={Signup}
+          options={{ headerShown: false }}
+        />
         </Stack.Navigator>
       </NavigationContainer>
     );

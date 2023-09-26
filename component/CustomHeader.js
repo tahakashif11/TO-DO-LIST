@@ -18,7 +18,7 @@ const CustomHeader = ({ title, navigation }) => {
     }
 
     // Dispatch the resetState action
-   
+    
     dispatch(resetState());
     dispatch(resetAuthState())
 

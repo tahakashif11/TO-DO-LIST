@@ -30,10 +30,8 @@ const MyHome = () => {
   const [editingTask, setEditingTask] = useState(null);
   const [editedTaskText, setEditedTaskText] = useState('');
   const [activeFilter, setActiveFilter] = useState('All'); // Track the active filter
+
   
-
-    
-
   const filteredTasks = tasks.filter((task) => {
     if (showCompleteTasks && showIncompleteTasks) {
       return true;

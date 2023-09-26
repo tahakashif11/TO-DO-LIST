@@ -1,29 +1,38 @@
-import { StyleSheet, Text, View, Image, ImageBackground, ActivityIndicator } from 'react-native';
-import React, { useEffect, useState } from 'react'; 
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { View, Text, ActivityIndicator, ImageBackground,StyleSheet } from 'react-native';
 import { fetchUserProfile } from '../redux/profileSlice';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import storage from '@react-native-firebase/storage'
 const Profile = () => {
   const dispatch = useDispatch();
-  const userId = useSelector((state) => state.auth.userId); 
-  console.log('yes'+userId)
-  
+  const userId = useSelector((state) => state.auth.authToken);
+
+
+
+
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
+
+
         dispatch(fetchUserProfile(userId));
+        
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
     };
 
-    fetchData(); // Call the async function inside useEffect
-  }, [dispatch, userId]); // Dependencies array for useEffect
-
+    if (userId) {
+      fetchData();
+    }
+  }, [dispatch, userId]);
   const userData = useSelector((state) => state.profile.userData);
-  console.log(userData)
   const loading = useSelector((state) => state.profile.loading);
+  console.log(userData)
+  
 
   return (
     <View style={styles.container}>
@@ -32,12 +41,12 @@ const Profile = () => {
       ) : userData ? (
         <ImageBackground
           source={{
-            uri: userData.image,
+            uri: userData.uri,
           }}
           style={styles.imageBackground}
         >
           <View style={styles.overlay}>
-            <Text style={styles.nameText}>Name: {userData.firstName}</Text>
+            <Text style={styles.nameText}>Name: {userData.username}</Text>
             <Text style={styles.emailText}>Email: {userData.email}</Text>
             <Text style={styles.weightText}>Weight: {userData.weight} kg</Text>
           </View>

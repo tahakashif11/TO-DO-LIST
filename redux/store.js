@@ -7,10 +7,10 @@ const store = configureStore({
   reducer: persistedReducer, 
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware({
-      serializableCheck: false, // Disable serializable action check
+      serializableCheck: false, 
     });
   },
-  // Use the persisted reducer
+  
 });
 
 const persistor = persistStore(store);
