@@ -1,43 +1,79 @@
-import React, { useState,useEffect } from 'react';
+// MyHome.js
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, TextInput, Button, ScrollView, Keyboard, TouchableOpacity } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  addTask,
-  deleteTask,
-  toggleComplete,
-  editTask,
-  setSearchQuery,
-  setShowCompleteTasks,
-  setShowIncompleteTasks,
-} from '../redux/taskSlice';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  Button,
-  ScrollView,
-  Keyboard,
-  TouchableOpacity, // Import TouchableOpacity for button styling
-} from 'react-native';
+import firestore from '@react-native-firebase/firestore';
+import { setTasks, setActiveFilter, setSearchQuery, addTask, deleteTask, toggleComplete, editTask } from '../redux/taskSlice';
 
 const MyHome = () => {
-  const tasks = useSelector((state) => state.tasks.tasks);
-  const showCompleteTasks = useSelector((state) => state.tasks.showCompleteTasks);
-  const showIncompleteTasks = useSelector((state) => state.tasks.showIncompleteTasks);
-  const searchQuery = useSelector((state) => state.tasks.searchQuery);
   const dispatch = useDispatch();
+  const tasks = useSelector((state) => state.tasks.tasks);
+  const activeFilter = useSelector((state) => state.tasks.activeFilter);
+  const searchQuery = useSelector((state) => state.tasks.searchQuery);
+  const userId = useSelector((state) => state.auth.authToken);
+  const tasksCollection = firestore().collection('tasks');
   const [newTask, setNewTask] = useState('');
   const [editingTask, setEditingTask] = useState(null);
   const [editedTaskText, setEditedTaskText] = useState('');
-  const [activeFilter, setActiveFilter] = useState('All'); // Track the active filter
 
-  
+  useEffect(() => {
+    const unsubscribe = tasksCollection
+      .where('userId', '==', userId)
+      .onSnapshot((querySnapshot) => {
+        const updatedTasks = [];
+        querySnapshot.forEach((documentSnapshot) => {
+          updatedTasks.push({
+            id: documentSnapshot.id,
+            ...documentSnapshot.data(),
+          });
+        });
+        dispatch(setTasks(updatedTasks));
+      });
+
+    return () => unsubscribe();
+  }, [dispatch, userId]);
+
+  const addTaskHandler = () => {
+    if (newTask.trim() !== '') {
+      const taskToAdd = {
+        text: newTask,
+        completed: false,
+        userId: userId,
+      };
+      tasksCollection.add(taskToAdd);
+      dispatch(addTask(taskToAdd));
+      setNewTask('');
+      Keyboard.dismiss();
+    }
+  };
+
+  const deleteTaskHandler = (taskId) => {
+    tasksCollection.doc(taskId).delete();
+    dispatch(deleteTask(taskId));
+  };
+
+  const toggleCompleteHandler = (taskId) => {
+    const task = tasks.find((t) => t.id === taskId);
+    if (task) {
+      tasksCollection.doc(taskId).update({ completed: !task.completed });
+      dispatch(toggleComplete(taskId));
+    }
+  };
+
+  const editTaskHandler = (taskToEdit, editedText) => {
+    tasksCollection.doc(taskToEdit.id).update({ text: editedText });
+    dispatch(editTask({ id: taskToEdit.id, text: editedText }));
+    setEditingTask(null);
+  };
+
+  const applyFilter = (filter) => {
+    dispatch(setActiveFilter(filter));
+  };
+
   const filteredTasks = tasks.filter((task) => {
-    if (showCompleteTasks && showIncompleteTasks) {
-      return true;
-    } else if (showCompleteTasks) {
+    if (activeFilter === 'Complete') {
       return task.completed;
-    } else if (showIncompleteTasks) {
+    } else if (activeFilter === 'Incomplete') {
       return !task.completed;
     } else {
       return true;
@@ -45,50 +81,8 @@ const MyHome = () => {
   });
 
   const searchedTasks = filteredTasks.filter((task) =>
-    task.text.toString().toLowerCase().includes(searchQuery.toLowerCase())
+    task.text.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const addTaskHandler = () => {
-    if (newTask.trim() !== '') {
-      dispatch(addTask(newTask));
-      setNewTask('');
-      // Dismiss the keyboard after adding a task
-      Keyboard.dismiss();
-    }
-  };
-
-  const deleteTaskHandler = (taskId) => {
-    dispatch(deleteTask(taskId));
-  };
-
-  const toggleCompleteHandler = (taskId) => {
-    dispatch(toggleComplete(taskId));
-  };
-
-  const editTaskHandler = (taskToEdit, editedText) => {
-    dispatch(editTask({ id: taskToEdit.id, text: editedText }));
-    setEditingTask(null);
-  };
-
-  const applyFilter = (filter) => {
-    setActiveFilter(filter);
-    switch (filter) {
-      case 'All':
-        dispatch(setShowCompleteTasks(false));
-        dispatch(setShowIncompleteTasks(false));
-        break;
-      case 'Complete':
-        dispatch(setShowCompleteTasks(true));
-        dispatch(setShowIncompleteTasks(false));
-        break;
-      case 'Incomplete':
-        dispatch(setShowCompleteTasks(false));
-        dispatch(setShowIncompleteTasks(true));
-        break;
-      default:
-        break;
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -111,19 +105,19 @@ const MyHome = () => {
 
       <View style={styles.filterContainer}>
         <TouchableOpacity
-          style={[styles.filterButton, activeFilter === 'All' && styles.activeFilter]} // Apply active style
+          style={[styles.filterButton, activeFilter === 'All' && styles.activeFilter]}
           onPress={() => applyFilter('All')}
         >
           <Text style={styles.filterButtonText}>All</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.filterButton, activeFilter === 'Complete' && styles.activeFilter]} // Apply active style
+          style={[styles.filterButton, activeFilter === 'Complete' && styles.activeFilter]}
           onPress={() => applyFilter('Complete')}
         >
           <Text style={styles.filterButtonText}>Complete</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.filterButton, activeFilter === 'Incomplete' && styles.activeFilter]} // Apply active style
+          style={[styles.filterButton, activeFilter === 'Incomplete' && styles.activeFilter]}
           onPress={() => applyFilter('Incomplete')}
         >
           <Text style={styles.filterButtonText}>Incomplete</Text>
@@ -139,8 +133,8 @@ const MyHome = () => {
               <View style={styles.editContainer}>
                 <TextInput
                   style={styles.editInput}
-                  onChangeText={(text) => setEditedTaskText(text)} // Update edited text
-                  value={editedTaskText} // Use editedTaskText for input value
+                  onChangeText={(text) => setEditedTaskText(text)}
+                  value={editedTaskText}
                 />
                 <Button
                   title="Save"
@@ -150,9 +144,7 @@ const MyHome = () => {
             ) : (
               <>
                 <Text
-                  style={
-                    task.completed ? styles.completedTask : styles.taskText
-                  }
+                  style={task.completed ? styles.completedTask : styles.taskText}
                 >
                   {task.text ? task.text : ''}
                 </Text>
@@ -215,7 +207,7 @@ const styles = StyleSheet.create({
   },
   filterButton: {
     flex: 1,
-    backgroundColor: '#f0f0f0', // Background color for filter buttons
+    backgroundColor: '#f0f0f0',
     padding: 8,
     borderRadius: 8,
     alignItems: 'center',
@@ -224,7 +216,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   activeFilter: {
-    backgroundColor: '#3498db', // Background color for active filter button
+    backgroundColor: '#3498db',
   },
   subtitle: {
     fontSize: 20,

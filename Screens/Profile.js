@@ -3,15 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { View, Text, ActivityIndicator, ImageBackground,StyleSheet } from 'react-native';
 import { fetchUserProfile } from '../redux/profileSlice';
 
-import storage from '@react-native-firebase/storage'
 const Profile = () => {
   const dispatch = useDispatch();
   const userId = useSelector((state) => state.auth.authToken);
-
-
-
-
-
 
   useEffect(() => {
     const fetchData = async () => {

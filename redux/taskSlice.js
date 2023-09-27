@@ -1,71 +1,51 @@
 // taskSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
+const initialState = {
+  tasks: [],
+  activeFilter: 'All',
+  searchQuery: '',
+};
+
 const taskSlice = createSlice({
   name: 'tasks',
-  initialState: {
-    tasks: [],
-    nextId: 1,
-    showCompleteTasks: false,
-    showIncompleteTasks: false,
-    searchQuery: '',
-  },
+  initialState,
   reducers: {
+    setTasks: (state, action) => {
+      state.tasks = action.payload;
+    },
+    setActiveFilter: (state, action) => {
+      state.activeFilter = action.payload;
+    },
+    setSearchQuery: (state, action) => {
+      state.searchQuery = action.payload;
+    },
     addTask: (state, action) => {
-      state.tasks.push({ id: state.nextId, text: action.payload, completed: false });
-      state.nextId++;
+      state.tasks.push(action.payload);
     },
     deleteTask: (state, action) => {
-      state.tasks = state.tasks.filter((task) => task.id !== action.payload);
+      state.tasks = state.tasks.filter(task => task.id !== action.payload);
     },
     toggleComplete: (state, action) => {
-      const task = state.tasks.find((task) => task.id === action.payload);
+      const task = state.tasks.find(task => task.id === action.payload);
       if (task) {
         task.completed = !task.completed;
       }
     },
     editTask: (state, action) => {
-      const task = state.tasks.find((task) => task.id === action.payload.id);
+      const task = state.tasks.find(task => task.id === action.payload.id);
       if (task) {
         task.text = action.payload.text;
-        console.log(task)
-        console.log(task.text)
       }
     },
-    setShowCompleteTasks: (state, action) => {
-      state.showCompleteTasks = action.payload;
-    },
-    setShowIncompleteTasks: (state, action) => {
-      state.showIncompleteTasks = action.payload;
-    },
-    setSearchQuery: (state, action) => {
-      state.searchQuery = action.payload;
-    },
-    resetState: (state) => {
-      // Reset the state to its initial values here
+    resetState: (state, action) => {
       state.tasks = [];
-      state.nextId = 1;
-      state.showCompleteTasks = false;
-      state.showIncompleteTasks = false;
+      state.activeFilter = 'All';
       state.searchQuery = '';
     },
-    
-    
-      
   },
 });
 
-export const {
-  addTask,
-  deleteTask,
-  toggleComplete,
-  editTask,
-  setShowCompleteTasks,
-  setShowIncompleteTasks,
-  setSearchQuery,
-  resetState
-
- 
-} = taskSlice.actions;
+export const { setTasks, setActiveFilter, setSearchQuery, addTask, deleteTask, toggleComplete, editTask,resetState } = taskSlice.actions;
 
 export default taskSlice.reducer;

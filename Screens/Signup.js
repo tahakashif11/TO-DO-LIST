@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image, ScrollView, KeyboardAvoidingView } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { launchImageLibrary } from 'react-native-image-picker';
@@ -15,7 +15,6 @@ const Signup = ({ navigation }) => {
   const handleImageSelect = () => {
     launchImageLibrary({ mediaType: 'photo' }, (response) => {
       if (!response.didCancel && !response.error) {
-        console.log(response.assets[0].uri)
         setProfileImage(response.assets[0].uri);
       }
     });
@@ -32,20 +31,16 @@ const Signup = ({ navigation }) => {
       const userCredential = await auth().createUserWithEmailAndPassword(email, password);
       const user = userCredential.user;
 
-      // Create a document in Firestore with the user's UID as the document ID
-     
-
       // Upload the profile image to Firestore under the user's ID
       const imageRef = await firestore().collection('users').doc(user.uid);
-      await imageRef.set({ 
-        uri: profileImage ,
+      await imageRef.set({
+        uri: profileImage,
         username: username,
         email: email,
         weight: weight,
       });
 
       // User and profile image have been created successfully
-      console.log('User created:', user.uid);
       navigation.navigate('Login');
     } catch (error) {
       console.error('Error creating user:', error);
@@ -59,65 +54,70 @@ const Signup = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Sign-up</Text>
-      </View>
-      <TouchableOpacity style={styles.button} onPress={handleImageSelect}>
+    <ScrollView contentContainerStyle={styles.container}>
+      <KeyboardAvoidingView behavior="padding" style={styles.innerContainer}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Sign-up</Text>
+        </View>
+        <TouchableOpacity style={styles.imageButton} onPress={handleImageSelect}>
           <Text style={styles.buttonText}>Select Profile Image</Text>
         </TouchableOpacity>
-      <View style={styles.form}>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          onChangeText={(text) => setEmail(text)}
-          value={email}
-        />
+        <View style={styles.form}>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            onChangeText={(text) => setEmail(text)}
+            value={email}
+          />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Username"
-          onChangeText={(text) => setUsername(text)}
-          value={username}
-        />
+          <TextInput
+            style={styles.input}
+            placeholder="Username"
+            onChangeText={(text) => setUsername(text)}
+            value={username}
+          />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry
-          onChangeText={(text) => setPassword(text)}
-          value={password}
-        />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            secureTextEntry
+            onChangeText={(text) => setPassword(text)}
+            value={password}
+          />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Weight (in kg)"
-          onChangeText={(text) => setWeight(text)}
-          value={weight}
-        />
+          <TextInput
+            style={styles.input}
+            placeholder="Weight (in kg)"
+            onChangeText={(text) => setWeight(text)}
+            value={weight}
+            keyboardType="numeric"
+          />
 
-        
+          {profileImage && (
+            <Image source={{ uri: profileImage }} style={styles.profileImage} />
+          )}
 
-        {profileImage && (
-          <Image source={{ uri: profileImage }} style={styles.profileImage} />
-        )}
+          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+            <Text style={styles.buttonText}>Submit</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Submit</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button} onPress={handleback}>
-          <Text style={styles.buttonText}>Go-Back</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+          <TouchableOpacity style={styles.button} onPress={handleback}>
+            <Text style={styles.buttonText}>Go Back</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
+    backgroundColor: '#ffffff',
+  },
+  innerContainer: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
   },
   header: {
     backgroundColor: '#3498db',
@@ -125,40 +125,46 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     color: '#fff',
   },
   form: {
-    flex: 1,
     justifyContent: 'center',
-    padding: 16,
+    padding: 20,
   },
   input: {
-    height: 40,
+    height: 50,
     borderColor: '#ccc',
     borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 12,
-    paddingHorizontal: 10,
-    backgroundColor: '#fff',
+    borderRadius: 8,
+    marginBottom: 20,
+    paddingHorizontal: 15,
+    backgroundColor: '#f2f2f2',
   },
   button: {
     backgroundColor: '#3498db',
-    padding: 12,
-    borderRadius: 5,
+    padding: 16,
+    borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 20,
+  },
+  imageButton: {
+    backgroundColor: '#3498db',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 20,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
   },
   profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
     alignSelf: 'center',
-    marginVertical: 12,
+    marginVertical: 20,
   },
 });
 

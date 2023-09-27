@@ -1,6 +1,5 @@
 // In your profileSlice.js
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
 import  firestore  from '@react-native-firebase/firestore';
 export const fetchUserProfile = createAsyncThunk(
   'profile/fetchUserProfile',
