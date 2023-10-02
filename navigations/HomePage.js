@@ -4,8 +4,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { StyleSheet, Button, View } from 'react-native'
 import React from 'react'
 
-import Profile from './Profile';
-import MyHome from './MyHome';
+import Profile from '../Screens/Profile';
+import MyHome from '../Screens/MyHome';
 
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 
@@ -54,7 +54,7 @@ export default HomePage
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, // Make the container take up the entire screen
-    backgroundColor: 'tomato', // Set the background color to tomato
+    flex: 1, 
+    backgroundColor: 'tomato', 
   },
 })

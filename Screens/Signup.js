@@ -9,9 +9,8 @@ const Signup = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [weight, setWeight] = useState('');
-  const [profileImage, setProfileImage] = useState(null); // To store the selected profile image URI
+  const [profileImage, setProfileImage] = useState(null); 
 
-  // Function to handle image selection from the gallery
   const handleImageSelect = () => {
     launchImageLibrary({ mediaType: 'photo' }, (response) => {
       if (!response.didCancel && !response.error) {
@@ -19,19 +18,20 @@ const Signup = ({ navigation }) => {
       }
     });
   };
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?&])[A-Za-z0-9@$!%*?&]{8,16}$/;
+  const emailRegex = /^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+  const weightRegex = /^[0-9]+$/;
+  const usernameRegex=/^[a-zA-z0-9]+$/;
 
   const handleSubmit = async () => {
-    // Check if any of the fields are empty or if the profile image is not selected
-    if (!email || !username || !password || !weight || !profileImage) {
-      Alert.alert('Error', 'Please fill in all fields and select a profile image');
+    if ((!emailRegex.test(email)) || (!usernameRegex.test(username)) || (!passwordRegex.test(password)) || (!weightRegex.test(weight)) ) {
+      Alert.alert('Error', 'Please fill in all fields and correctly according to the format');
       return;
     }
 
     try {
       const userCredential = await auth().createUserWithEmailAndPassword(email, password);
       const user = userCredential.user;
-
-      // Upload the profile image to Firestore under the user's ID
       const imageRef = await firestore().collection('users').doc(user.uid);
       await imageRef.set({
         uri: profileImage,
@@ -39,12 +39,9 @@ const Signup = ({ navigation }) => {
         email: email,
         weight: weight,
       });
-
-      // User and profile image have been created successfully
       navigation.navigate('Login');
     } catch (error) {
       console.error('Error creating user:', error);
-      // Handle error here, e.g., show an error message to the user
       Alert.alert('Error', 'Error creating user. Please try again.');
     }
   };
@@ -65,21 +62,21 @@ const Signup = ({ navigation }) => {
         <View style={styles.form}>
           <TextInput
             style={styles.input}
-            placeholder="Email"
+            placeholder="Email should be legal"
             onChangeText={(text) => setEmail(text)}
             value={email}
           />
 
           <TextInput
             style={styles.input}
-            placeholder="Username"
+            placeholder="Username should not contain number"
             onChangeText={(text) => setUsername(text)}
             value={username}
           />
 
           <TextInput
             style={styles.input}
-            placeholder="Password"
+            placeholder="Password should contain 8 "
             secureTextEntry
             onChangeText={(text) => setPassword(text)}
             value={password}
@@ -87,7 +84,7 @@ const Signup = ({ navigation }) => {
 
           <TextInput
             style={styles.input}
-            placeholder="Weight (in kg)"
+            placeholder="Weight (in kg) should be digit"
             onChangeText={(text) => setWeight(text)}
             value={weight}
             keyboardType="numeric"

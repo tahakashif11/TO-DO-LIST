@@ -1,89 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import HomePage from './Screens/HomePage';
-import LoginPage from './Screens/LoginPage';
-import CustomHeader from './component/CustomHeader';
-import Signup from './Screens/Signup';
-import { useSelector } from 'react-redux';
-
-const Stack = createNativeStackNavigator();
-
+import React from 'react';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './redux/store';
+import MainNavigation from './navigations/MainNavigation';
 const App = () => {
-  const authToken = useSelector((state) => state.auth.authToken);
-
-  const [initialRoute, setInitialRoute] = useState('Loading');
-
-  useEffect(() => {
-    const authenticateUser = () => {
-      console.log(authToken)
-      const route = authToken ? 'Home' : 'Login';
-
-      setInitialRoute(route);
-    };
-
-    authenticateUser();
-  }, [authToken]);
-
-  if (initialRoute === 'Loading') {
-    return null; // You can render a loading screen here if needed
-  } else if (initialRoute === 'Login'){
-    return (
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName={initialRoute}>
-          <Stack.Screen
-            name="Login"
-            component={LoginPage}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Home"
-            component={HomePage}
-            options={{
-              title: 'TODO APP',
-              header: ({ navigation, options }) => (
-                <CustomHeader title={options.title} navigation={navigation} />
-              ),
-              headerBackVisible: false,
-            }}
-          />
-          <Stack.Screen
-          name="Signup"
-          component={Signup}
-          options={{ headerShown: false }}
-        />
-        </Stack.Navigator>
-      </NavigationContainer>
-    );
-  } else if (initialRoute === 'Home'){
-    return (
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName={initialRoute}>
-          <Stack.Screen
-            name="Login"
-            component={LoginPage}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Home"
-            component={HomePage}
-            options={{
-              title: 'TODO APP',
-              header: ({ navigation, options }) => (
-                <CustomHeader title={options.title} navigation={navigation} />
-              ),
-              headerBackVisible: false,
-            }}
-          />
-          <Stack.Screen
-          name="Signup"
-          component={Signup}
-          options={{ headerShown: false }}
-        />
-        </Stack.Navigator>
-      </NavigationContainer>
-    );
-  }
+  return (
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <MainNavigation />
+      </PersistGate>
+    </Provider>
+  );
 };
 
 export default App;
