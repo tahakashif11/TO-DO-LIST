@@ -1,11 +1,11 @@
-// In your profileSlice.js
+
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import  firestore  from '@react-native-firebase/firestore';
 export const fetchUserProfile = createAsyncThunk(
   'profile/fetchUserProfile',
   async (userId) => {
     try {
-      // Assuming you have a Firestore collection named 'users'
+      
       const userDoc = await firestore().collection('users').doc(userId).get();
       console.log('ok'+userDoc)
 

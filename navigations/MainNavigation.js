@@ -5,9 +5,7 @@ import AuthNavigation from './AuthNavigation'
 
 const MainNavigation = () => {
   const authToken = useSelector((state) => state.auth.authToken);
-
   const [initialRoute, setInitialRoute] = useState('Loading');
-
   useEffect(() => {
     const authenticateUser = () => {
       console.log(authToken)

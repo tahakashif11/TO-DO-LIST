@@ -1,7 +1,7 @@
 // store.js
 import { configureStore } from '@reduxjs/toolkit';
-import { persistStore } from 'redux-persist'; // Remove persistReducer import
-import persistedReducer from './rootreducer'; // Import your combined reducer
+import { persistStore } from 'redux-persist'; 
+import persistedReducer from './rootreducer'; 
 
 const store = configureStore({
   reducer: persistedReducer, 
