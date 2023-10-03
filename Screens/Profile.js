@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { View, Text, ActivityIndicator, ImageBackground,StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator, ImageBackground, StyleSheet } from 'react-native';
 import { fetchUserProfile } from '../redux/profileSlice';
 
 const Profile = () => {
@@ -13,7 +13,7 @@ const Profile = () => {
 
 
         dispatch(fetchUserProfile(userId));
-        
+
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -26,17 +26,17 @@ const Profile = () => {
   const userData = useSelector((state) => state.profile.userData);
   const loading = useSelector((state) => state.profile.loading);
   console.log(userData)
-  
+
 
   return (
     <View style={styles.container}>
       {loading ? (
         <ActivityIndicator size="large" color="blue" />
       ) : userData ? (
-        
 
-        
-       
+
+
+
         <ImageBackground
           source={{
             uri: userData.uri,
@@ -48,10 +48,10 @@ const Profile = () => {
             <Text style={styles.emailText}>Email: {userData.email}</Text>
             <Text style={styles.weightText}>Weight: {userData.weight} kg</Text>
           </View>
-        
+
         </ImageBackground>
-        
-        
+
+
       ) : (
         <Text style={styles.noProfilePicText}>Profile picture doesn't exist.</Text>
       )}

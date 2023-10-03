@@ -51,13 +51,13 @@ function LoginPage({ navigation }) {
             <TextInput
               style={styles.input}
               placeholder="email"
-              placeholderTextColor="#ccc" // Customize placeholder color
+              placeholderTextColor="#ccc" 
               onChangeText={(text) => setemail(text)}
             />
             <TextInput
               style={styles.input}
               placeholder="Password"
-              placeholderTextColor="#ccc" // Customize placeholder color
+              placeholderTextColor="#ccc" 
               secureTextEntry
               onChangeText={(text) => setPassword(text)}
             />

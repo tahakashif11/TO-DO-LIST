@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image, ScrollView, KeyboardAvoidingView } from 'react-native';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
-import { launchImageLibrary } from 'react-native-image-picker';
+import { useDispatch } from 'react-redux';
+import { signUpUser } from '../redux/signupslice'; 
+import {launchImageLibrary} from 'react-native-image-picker'
 
 const Signup = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [weight, setWeight] = useState('');
-  const [profileImage, setProfileImage] = useState(null); 
+  const [profileImage, setProfileImage] = useState(null);
+
+  const dispatch = useDispatch();
 
   const handleImageSelect = () => {
     launchImageLibrary({ mediaType: 'photo' }, (response) => {
@@ -24,27 +26,36 @@ const Signup = ({ navigation }) => {
   const usernameRegex=/^[a-zA-z0-9]+$/;
 
   const handleSubmit = async () => {
-    if ((!emailRegex.test(email)) || (!usernameRegex.test(username)) || (!passwordRegex.test(password)) || (!weightRegex.test(weight)) ) {
-      Alert.alert('Error', 'Please fill in all fields and correctly according to the format');
-      return;
-    }
+    
+    const userData = {
+      email,
+      username,
+      password,
+      weight,
+      profileImage,
+    };
 
     try {
-      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
-      const user = userCredential.user;
-      const imageRef = await firestore().collection('users').doc(user.uid);
-      await imageRef.set({
-        uri: profileImage,
-        username: username,
-        email: email,
-        weight: weight,
-      });
+      await dispatch(signUpUser(userData));
+      if (
+        !emailRegex.test(email) ||
+        !usernameRegex.test(username) ||
+        !passwordRegex.test(password) ||
+        !weightRegex.test(weight)
+      ) {
+        Alert.alert('Error', 'Please fill in all fields and correctly according to the format');
+        return;
+      }
+  
       navigation.navigate('Login');
     } catch (error) {
       console.error('Error creating user:', error);
       Alert.alert('Error', 'Error creating user. Please try again.');
     }
   };
+
+
+
 
   function handleback() {
     navigation.navigate('Login');
