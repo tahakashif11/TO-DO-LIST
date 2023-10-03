@@ -1,7 +1,7 @@
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
-import { StyleSheet, Button, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import React from 'react'
 
 import Profile from '../Screens/Profile';

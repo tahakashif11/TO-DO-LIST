@@ -13,6 +13,7 @@ import {
 
 import firestore from '@react-native-firebase/firestore';
 import {  useSelector } from 'react-redux';
+import homestyles from '../styles/stylesscreenMyHome';
 
 const MyHome = () => {
   const [tasks, setTasks] = useState([]);
@@ -89,54 +90,54 @@ const MyHome = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Hello</Text>
+    <View style={homestyles.container}>
+      <Text style={homestyles.title}>Hello</Text>
 
       <TextInput
-        style={styles.input}
+        style={homestyles.input}
         placeholder="Search"
         onChangeText={(text) => setSearchQuery(text)}
         value={searchQuery}
       />
 
       <TextInput
-        style={styles.input}
+        style={homestyles.input}
         placeholder="Add Task"
         onChangeText={(text) => setNewTask(text)}
         value={newTask}
       />
       <Button title="Add Task" onPress={addTaskHandler} />
 
-      <View style={styles.filterContainer}>
+      <View style={homestyles.filterContainer}>
         <TouchableOpacity
-          style={[styles.filterButton, activeFilter === 'All' && styles.activeFilter]}
+          style={[homestyles.filterButton, activeFilter === 'All' && homestyles.activeFilter]}
           onPress={() => applyFilter('All')}
         >
-          <Text style={styles.filterButtonText}>All</Text>
+          <Text style={homestyles.filterButtonText}>All</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.filterButton, activeFilter === 'Complete' && styles.activeFilter]}
+          style={[homestyles.filterButton, activeFilter === 'Complete' && homestyles.activeFilter]}
           onPress={() => applyFilter('Complete')}
         >
-          <Text style={styles.filterButtonText}>Complete</Text>
+          <Text style={homestyles.filterButtonText}>Complete</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.filterButton, activeFilter === 'Incomplete' && styles.activeFilter]}
+          style={[homestyles.filterButton, activeFilter === 'Incomplete' && homestyles.activeFilter]}
           onPress={() => applyFilter('Incomplete')}
         >
-          <Text style={styles.filterButtonText}>Incomplete</Text>
+          <Text style={homestyles.filterButtonText}>Incomplete</Text>
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.subtitle}>Tasks:</Text>
+      <Text style={homestyles.subtitle}>Tasks:</Text>
 
       <ScrollView>
         {searchedTasks.map((task) => (
-          <View key={task.id} style={styles.taskItem}>
+          <View key={task.id} style={homestyles.taskItem}>
             {editingTask === task.id ? (
-              <View style={styles.editContainer}>
+              <View style={homestyles.editContainer}>
                 <TextInput
-                  style={styles.editInput}
+                  style={homestyles.editInput}
                   onChangeText={(text) => setEditedTaskText(text)}
                   value={editedTaskText}
                 />
@@ -148,7 +149,7 @@ const MyHome = () => {
             ) : (
               <>
                 <Text
-                  style={task.completed ? styles.completedTask : styles.taskText}
+                  style={task.completed ? homestyles.completedTask : homestyles.taskText}
                 >
                   {task.text ? task.text : ''}
                 </Text>
@@ -180,72 +181,5 @@ const MyHome = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    marginBottom: 8,
-  },
-  editInput: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    marginBottom: 8,
-    flex: 1,
-  },
-  filterContainer: {
-    paddingTop: 8,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  filterButton: {
-    flex: 1,
-    backgroundColor: '#f0f0f0',
-    padding: 8,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  filterButtonText: {
-    fontSize: 16,
-  },
-  activeFilter: {
-    backgroundColor: '#3498db',
-  },
-  subtitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginTop: 16,
-  },
-  taskItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  taskText: {
-    flex: 1,
-    fontSize: 16,
-  },
-  completedTask: {
-    fontSize: 16,
-    textDecorationLine: 'line-through',
-    color: 'gray',
-    flex: 1,
-  },
-  editContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-});
 
 export default MyHome;
