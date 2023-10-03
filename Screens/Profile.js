@@ -33,6 +33,10 @@ const Profile = () => {
       {loading ? (
         <ActivityIndicator size="large" color="blue" />
       ) : userData ? (
+        
+
+        
+       
         <ImageBackground
           source={{
             uri: userData.uri,
@@ -44,9 +48,12 @@ const Profile = () => {
             <Text style={styles.emailText}>Email: {userData.email}</Text>
             <Text style={styles.weightText}>Weight: {userData.weight} kg</Text>
           </View>
+        
         </ImageBackground>
+        
+        
       ) : (
-        <Text>Loading user data...</Text>
+        <Text style={styles.noProfilePicText}>Profile picture doesn't exist.</Text>
       )}
     </View>
   );

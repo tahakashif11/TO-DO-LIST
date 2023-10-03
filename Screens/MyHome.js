@@ -1,24 +1,33 @@
-// MyHome.js
+
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, ScrollView, Keyboard, TouchableOpacity } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Button,
+  ScrollView,
+  Keyboard,
+  TouchableOpacity,
+} from 'react-native';
+
 import firestore from '@react-native-firebase/firestore';
-import { setTasks, setActiveFilter, setSearchQuery, addTask, deleteTask, toggleComplete, editTask } from '../redux/taskSlice';
+import {  useSelector } from 'react-redux';
 
 const MyHome = () => {
-  const dispatch = useDispatch();
-  const tasks = useSelector((state) => state.tasks.tasks);
-  const activeFilter = useSelector((state) => state.tasks.activeFilter);
-  const searchQuery = useSelector((state) => state.tasks.searchQuery);
-  const userId = useSelector((state) => state.auth.authToken);
-  const tasksCollection = firestore().collection('tasks');
+  const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
   const [editingTask, setEditingTask] = useState(null);
   const [editedTaskText, setEditedTaskText] = useState('');
+  const [activeFilter, setActiveFilter] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const tasksCollection = firestore().collection('tasks');
+  const userId = useSelector((state) => state.auth.authToken);
+
 
   useEffect(() => {
     const unsubscribe = tasksCollection
-      .where('userId', '==', userId)
+      .where('userId', '==', userId) 
       .onSnapshot((querySnapshot) => {
         const updatedTasks = [];
         querySnapshot.forEach((documentSnapshot) => {
@@ -27,21 +36,19 @@ const MyHome = () => {
             ...documentSnapshot.data(),
           });
         });
-        dispatch(setTasks(updatedTasks));
+        setTasks(updatedTasks);
       });
-
+  
     return () => unsubscribe();
-  }, [dispatch, userId]);
+  }, [userId]); 
 
   const addTaskHandler = () => {
     if (newTask.trim() !== '') {
-      const taskToAdd = {
+      tasksCollection.add({
         text: newTask,
         completed: false,
-        userId: userId,
-      };
-      tasksCollection.add(taskToAdd);
-      dispatch(addTask(taskToAdd));
+        userId: userId, 
+      });
       setNewTask('');
       Keyboard.dismiss();
     }
@@ -49,25 +56,22 @@ const MyHome = () => {
 
   const deleteTaskHandler = (taskId) => {
     tasksCollection.doc(taskId).delete();
-    dispatch(deleteTask(taskId));
   };
 
   const toggleCompleteHandler = (taskId) => {
     const task = tasks.find((t) => t.id === taskId);
     if (task) {
       tasksCollection.doc(taskId).update({ completed: !task.completed });
-      dispatch(toggleComplete(taskId));
     }
   };
 
   const editTaskHandler = (taskToEdit, editedText) => {
     tasksCollection.doc(taskToEdit.id).update({ text: editedText });
-    dispatch(editTask({ id: taskToEdit.id, text: editedText }));
     setEditingTask(null);
   };
 
   const applyFilter = (filter) => {
-    dispatch(setActiveFilter(filter));
+    setActiveFilter(filter);
   };
 
   const filteredTasks = tasks.filter((task) => {
@@ -91,7 +95,7 @@ const MyHome = () => {
       <TextInput
         style={styles.input}
         placeholder="Search"
-        onChangeText={(text) => dispatch(setSearchQuery(text))}
+        onChangeText={(text) => setSearchQuery(text)}
         value={searchQuery}
       />
 
